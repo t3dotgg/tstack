@@ -46,7 +46,6 @@ reports only what comes after.
 from __future__ import annotations
 
 import argparse
-import fcntl
 import hashlib
 import html
 import json
@@ -58,6 +57,12 @@ import time
 from collections.abc import Sequence
 from pathlib import Path
 from typing import Any, NoReturn
+
+try:
+    import fcntl
+except ImportError:  # Windows has no fcntl. try_lock() uses msvcrt there.
+    fcntl = None
+    import msvcrt
 
 GATING_BOTS = ("greptile", "macroscope")
 ADVISORY_BOTS = ("coderabbit",)
@@ -124,7 +129,9 @@ def gh(args: list[str], allow: tuple[int, ...] = (0,)) -> subprocess.CompletedPr
     """Run gh. Retries transient failures (HTTP 5xx or 429, network) with backoff."""
     delay = 2
     for attempt in range(5):
-        proc = subprocess.run(["gh", *args], capture_output=True, text=True)
+        # gh writes UTF-8. Without an explicit encoding, Windows decodes it as the
+        # ANSI code page, and a comment with an emoji loses the whole response.
+        proc = subprocess.run(["gh", *args], capture_output=True, text=True, encoding="utf-8", errors="replace")
         transient = proc.returncode != 0 and bool(TRANSIENT.search(proc.stderr))
         if not transient and proc.returncode in allow:
             return proc
@@ -204,13 +211,29 @@ def parse_target(raw: str | None, repo: str | None) -> tuple[str, int]:
     return repo, pr
 
 
+def try_lock(handle: Any) -> bool:
+    """Take an exclusive lock without waiting. False when another process holds it."""
+    if fcntl:
+        try:
+            fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            return False
+        return True
+    # Windows locks are mandatory: a locked byte cannot be read. Lock one byte far
+    # past the pid text, so a second watcher can still read which pid holds it.
+    os.lseek(handle.fileno(), 1 << 20, os.SEEK_SET)
+    try:
+        msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
+    except OSError:
+        return False
+    return True
+
+
 def lock(repo: str, pr: int) -> Any:
     """Hold a per-PR lock for the life of the process. The OS drops it on exit."""
     STATE_DIR.mkdir(parents=True, exist_ok=True)
     handle = open(STATE_DIR / f"{repo.replace('/', '__')}__{pr}.lock", "a+")
-    try:
-        fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
-    except BlockingIOError:
+    if not try_lock(handle):
         handle.seek(0)
         pid = handle.read().strip() or "unknown"
         fail(
@@ -538,6 +561,9 @@ class Watcher:
 
 
 def main() -> None:
+    # Windows pipes use the ANSI code page, which cannot print most emoji in comments.
+    for stream in (sys.stdout, sys.stderr):
+        stream.reconfigure(encoding="utf-8", errors="replace")
     parser = argparse.ArgumentParser(prog="pr-wait", description="Watch a GitHub PR and print one line per real event.")
     parser.add_argument("pr", nargs="?", help="PR number or URL")
     parser.add_argument("--repo", help="owner/name (default: from the URL or the current checkout)")
