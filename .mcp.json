@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "azure": {
+      "command": "npx",
+      "args": ["-y", "@azure/mcp@latest", "server", "start"],
+      "env": {
+        "AZURE_TOKEN_CREDENTIALS": "AzureCliCredential"
+      }
+    }
+  }
+}
