@@ -49,9 +49,10 @@ met or the PR merges, 1 when it needs you (a required check failed, conflicts,
 unresolved threads, PR closed), and 2 on bad input.
 
 - `ready` (default): required checks green, Greptile or Macroscope reviewed the
-  head, and no unresolved threads. Use this to babysit.
-- `green`: required checks only. Use it when the repo has no Greptile or
-  Macroscope.
+  head — or no gating bot has ever reviewed the PR — and no unresolved threads.
+  Use this to babysit.
+- `green`: required checks only. Use it when you only care about checks, not
+  review bots.
 - `any-change`: exit on the first event.
 
 In Claude Code, run it with the Monitor tool (`timeout_ms: 3600000`), so each

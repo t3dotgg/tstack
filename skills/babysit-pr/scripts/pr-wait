@@ -12,7 +12,9 @@ Progress and errors that do not end the run go to stderr.
   green       required checks passed on the current head (every CI check when
               the base branch requires none)
   ready      green, Greptile or Macroscope reviewed the current head, and no
-              review thread is unresolved (default)
+              review thread is unresolved (default). When no gating bot has
+              ever reviewed the PR, ready falls back to green: a repo without
+              Greptile or Macroscope can finish.
   any-change  stop after the first poll that prints an event
 
 Exit codes
@@ -253,7 +255,8 @@ class Watcher:
         state = self.load()
         # First run for this PR: record what exists and report nothing.
         self.baseline = state is None
-        self.state: Json = state or {"reported": [], "summaries": {}, "base_oid": None, "merge_state": None}
+        self.state: Json = state or {"reported": [], "summaries": {}, "base_oid": None,
+                                    "merge_state": None, "gating_seen": False}
         self.reported: set[str] = set(self.state["reported"])
         self.printed: set[str] = set()
         self.events = 0
@@ -427,6 +430,11 @@ class Watcher:
             else:
                 done = on_head or any(short in s["body"] for s in summaries)
             seen = bool(own_checks or summaries or own_reviews)
+            # Remember that a gating bot exists on this PR, across restarts:
+            # a bot that reviewed an earlier head still gates, since it is
+            # installed and just has not reviewed this head yet.
+            if bot in GATING_BOTS and seen:
+                self.state["gating_seen"] = True
             if bot in ADVISORY_BOTS and own_checks:
                 desc = next(iter(own_checks.values()))
                 bot_status[bot] = f"{bot} {desc['description'] or desc['bucket']} (advisory)"
@@ -511,6 +519,17 @@ class Watcher:
                     self.finish(1, [behind_line])
                 self.reported.add(checks_key)
                 self.finish(0, [f"ready on {short}: {summary}{self.behind(base, base_oid, head)}"])
+            # No gating bot has ever reviewed this PR, so there is nothing to
+            # wait for: ready falls back to green. A bot seen on an earlier
+            # head still gates (see above), as does a bot with checks pending.
+            if green and self.until == "ready" and not reviewed and not self.state.get("gating_seen"):
+                if unresolved:
+                    self.finish(1, [f"blocked by {len(unresolved)} unresolved threads on {short}: {' '.join(unresolved)}"])
+                if merge_state == "BEHIND":
+                    self.finish(1, [behind_line])
+                self.reported.add(checks_key)
+                self.finish(0, [f"ready on {short}: {summary}{self.behind(base, base_oid, head)} "
+                                f"(no Greptile or Macroscope on this PR)"])
         if all_done and (stable or self.baseline):
             self.emit(checks_key, f"checks finished on {short}: {summary}")
         if self.until == "any-change" and self.events:
