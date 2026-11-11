@@ -20,5 +20,6 @@ skip this.
    asks and anything a delegate reversed.
 6. Repeat until every delegate rates the set 9/10 or more and yours wins every
    pair. Only the user ends it early.
-7. Put each round's scores in the PR, and the final screenshots in the PR and
-   the chat.
+7. In the PR, show the changes instead of listing them: simple before and
+   after screenshots with arrows and a few words per change. Add each round's
+   scores, and put the final screenshots in the chat too.
