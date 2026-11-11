@@ -253,6 +253,8 @@ class Watcher:
         state = self.load()
         # First run for this PR: record what exists and report nothing.
         self.baseline = state is None
+        # Set once a poll has recorded every comment, review and thread.
+        self.recorded = False
         self.state: Json = state or {"reported": [], "summaries": {}, "base_oid": None, "merge_state": None}
         self.reported: set[str] = set(self.state["reported"])
         self.printed: set[str] = set()
@@ -292,7 +294,10 @@ class Watcher:
     def finish(self, code: int, lines: Sequence[str] = ()) -> NoReturn:
         for line in lines:
             self.say(line)
-        self.save()
+        # A baseline that stopped before recording the PR would make the next
+        # run report every existing comment as new. Let that run baseline again.
+        if not self.baseline or self.recorded:
+            self.save()
         sys.exit(code)
 
     def fetch_pr(self) -> Json:
@@ -492,6 +497,7 @@ class Watcher:
         ]
         summary = "; ".join(p for p in parts if p)
         checks_key = f"checks:{head}"
+        self.recorded = True
 
         # Decide whether to stop. A green or ready line carries the same summary
         # as the checks line, so it marks that event as reported.
