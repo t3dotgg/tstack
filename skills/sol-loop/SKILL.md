@@ -48,23 +48,35 @@ missing or pre-failing checks in the brief.
 In T3, call `orchestrator_capabilities`. Pick the latest Sol unless the user
 named a version. Do not hardcode an ID. Record provider, model, and effort
 only if exposed. Use `delegate_task` every round (`role: "review"`,
-`mode: "async"`). Save `taskId`. New `clientRequestId` per round.
+`mode: "wait"`, `timeoutMs: 600000`). Save `taskId` and `childThreadId`.
+New `clientRequestId` per round. The review brief must tell Sol: "Read only
+the diff and the files it touches. Reply as soon as you have a verdict, then
+stop."
 `childThreadId` is storage, not the next target. Do not use
 `t3_thread_send`, `create_threads`, or `t3_thread_launch` for review.
 
 If T3 tools are not listed, try one direct capability call. Outside T3, use
 a native Sol subagent and keep its ID. In Claude Code, use a custom subagent
-only if it is set up to run Sol. If no route runs Sol, report the blocker. Do
-not substitute a model.
+only if it is set up to run Sol. Apply the same bounded wait and stop rules
+using that route's supported controls. If no route can enforce them, report
+the blocker. Do not substitute a model.
 
-Do not edit scoped files while review runs. Wait for the notice. Do not
-poll or start a second reviewer. Timeout, error, or no reply is not
-approval. On failure, cancel, verify stop, restart with the ledger.
+If a wait times out, read that child thread once. If a `VERDICT:` is already
+present, cancel the still-running task, verify it stopped, and use that
+verdict; do not wait for the child turn to finish. If there is no verdict,
+wait another 10 minutes and inspect again. Cap one review round at 30 minutes.
+At the cap, cancel the child and verify it stopped; if the review budget
+allows, start one fresh round with the same diff and the ledger. Otherwise
+report that no verdict was returned. A timeout, error, or silence is never
+approval. Do not edit scoped files while a reviewer is running or start a
+second reviewer before the first is confirmed stopped.
 
 Round 1 brief (T3 children get no history):
 
 ```
 Review only. Do not edit, commit, push, comment on PRs, or start subagents.
+Read only the diff and the files it touches. Reply as soon as you have a
+verdict, then stop.
 Repo: <abs path> Base: <sha> Intent: <intent> Out of scope: <scope> Checks: <results>
 See: git diff <base> [-- <paths>]; git status --short (read untracked).
 Read surrounding code. Find bugs, broken callers, mismatch with intent.
