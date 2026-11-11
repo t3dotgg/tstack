@@ -28,6 +28,14 @@ Some skills call others. Install the ones they need too:
 
 ## Install
 
+Install universally:
+
+```bash
+npx skills add t3dotgg/tstack
+```
+
+or install manually:
+
 ```bash
 git clone https://github.com/t3dotgg/tstack
 cp -R tstack/skills/* ~/.claude/skills/   # Claude Code
