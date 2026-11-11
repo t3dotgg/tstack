@@ -48,18 +48,23 @@ missing or pre-failing checks in the brief.
 In T3, call `orchestrator_capabilities`. Pick the latest Sol unless the user
 named a version. Do not hardcode an ID. Record provider, model, and effort
 only if exposed. Use `delegate_task` every round (`role: "review"`,
-`mode: "async"`). Save `taskId`. New `clientRequestId` per round.
-`childThreadId` is storage, not the next target. Do not use
-`t3_thread_send`, `create_threads`, or `t3_thread_launch` for review.
+`mode: "wait"`, `timeoutMs: 600000`). Save `taskId` and `childThreadId`.
+New `clientRequestId` per round. `childThreadId` is storage, not the next
+target. Do not use `t3_thread_send`, `create_threads`, or
+`t3_thread_launch` for review.
 
 If T3 tools are not listed, try one direct capability call. Outside T3, use
 a native Sol subagent and keep its ID. In Claude Code, use a custom subagent
 only if it is set up to run Sol. If no route runs Sol, report the blocker. Do
 not substitute a model.
 
-Do not edit scoped files while review runs. Wait for the notice. Do not
-poll or start a second reviewer. Timeout, error, or no reply is not
-approval. On failure, cancel, verify stop, restart with the ledger.
+Do not edit scoped files while review runs. Do not start a second reviewer.
+A `wait` that times out leaves the child running: `t3_thread_read` its
+thread. Once a `VERDICT:` line appears, `task_cancel` the child and use
+that verdict — the child's turn may never end. Otherwise `t3_thread_wait`
+10 more minutes and read again. After 30 minutes with no verdict, cancel,
+run one fresh round, then stop and report. Timeout, error, or no reply is
+not approval. On failure, cancel, verify stop, restart with the ledger.
 
 Round 1 brief (T3 children get no history):
 
@@ -68,6 +73,8 @@ Review only. Do not edit, commit, push, comment on PRs, or start subagents.
 Repo: <abs path> Base: <sha> Intent: <intent> Out of scope: <scope> Checks: <results>
 See: git diff <base> [-- <paths>]; git status --short (read untracked).
 Read surrounding code. Find bugs, broken callers, mismatch with intent.
+Read only the diff and the files it touches. Reply as soon as you have a
+verdict, then stop.
 Skip style unless it hides a bug. Hold to the smallest change. Flag code,
 tests, or guards the intent does not need. Other paths, rare cases, small
 perf, extra compat: nits.
