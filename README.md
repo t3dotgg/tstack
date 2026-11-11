@@ -28,6 +28,19 @@ Some skills call others. Install the ones they need too:
 
 ## Install
 
+### Claude Code plugin
+
+```text
+/plugin marketplace add t3dotgg/tstack
+/plugin install tstack@tstack
+```
+
+This installs every skill at once, so the skills that call each other all
+work. The plugin namespaces the skills, for example `/tstack:full-send`, and
+saying the trigger phrase still works.
+
+### Manual copy
+
 ```bash
 git clone https://github.com/t3dotgg/tstack
 cp -R tstack/skills/* ~/.claude/skills/   # Claude Code

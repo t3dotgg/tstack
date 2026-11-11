@@ -1,0 +1,13 @@
+{
+  "name": "tstack",
+  "version": "0.1.0",
+  "description": "Everyday agent skills for shipping PRs: full-send, full-stop, council, sol-loop, file-pr, takeover, babysit-pr, modernize, and leaving-pr-comments.",
+  "author": {
+    "name": "Theo Browne",
+    "email": "me@theo.li"
+  },
+  "homepage": "https://github.com/t3dotgg/tstack",
+  "repository": "https://github.com/t3dotgg/tstack",
+  "license": "MIT",
+  "keywords": ["github", "pull-requests", "code-review", "ci", "skills"]
+}

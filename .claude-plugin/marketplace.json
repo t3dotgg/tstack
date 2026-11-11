@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "tstack",
+  "description": "Everyday agent skills for shipping PRs: full-send, council, babysit-pr, and more.",
+  "owner": {
+    "name": "t3dotgg",
+    "url": "https://github.com/t3dotgg"
+  },
+  "plugins": [
+    {
+      "name": "tstack",
+      "source": "./",
+      "description": "Everyday agent skills for shipping PRs: full-send, full-stop, council, sol-loop, file-pr, takeover, babysit-pr, modernize, and leaving-pr-comments.",
+      "category": "productivity",
+      "tags": ["github", "pull-requests", "code-review", "ci", "skills"]
+    }
+  ]
+}
