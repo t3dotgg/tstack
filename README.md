@@ -11,7 +11,7 @@ not.
 |---|---|---|
 | `full-send` | "full send" | Takes a change to a merged PR with nobody watching: proves it, reviews it, files it, babysits it, merges it. |
 | `full-stop` | "full stop" | Same as `full-send`, but stops when the PR is ready for you to merge. |
-| `council` | "council" | Gets review from three models from different providers, and loops until they agree. |
+| `council` | "council" | Gets review from GPT Sol, Claude Opus, and Claude Fable, and loops until they agree. |
 | `sol-loop` | "sol loop" | Reviews a change with GPT Sol in a loop until both agents agree. |
 | `file-pr` | "file a PR" | Files a short PR that leads with the problem, not an inventory of changes. |
 | `takeover` | "take over" | Finishes someone else's PR, branch, or agent thread, and keeps their credit. |
