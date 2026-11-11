@@ -1,0 +1,13 @@
+# ~/.claude/skills links to skills/, so Claude Code keeps its copy of your
+# claude.ai skills here. They are private: never commit them.
+skills/synced/
+skills/.trash/
+
+# Machine-local Claude Code files.
+.claude/settings.local.json
+.claude/worktrees/
+
+# OS clutter.
+.DS_Store
+Thumbs.db
+desktop.ini
