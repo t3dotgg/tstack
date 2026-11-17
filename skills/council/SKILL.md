@@ -10,6 +10,9 @@ relevant checks. Give council the updated implementation; do not defer known
 fixes until reviews return. If the user wants to discard the implementation
 and explore new ideas, skip fixes to code being replaced.
 
+If the user asks only for review or feedback, do not change files, commits, or
+PR descriptions. Report the findings instead.
+
 Bring in three delegates to help with the user's request, usually for review
 or feedback. Use one strong model from each of three different providers, at
 high reasoning effort. If the user's instructions name council members, use
@@ -55,8 +58,8 @@ If the PR is open, edit the description. Do not post a comment for this.
 If there is no PR, put the same results in the final reply only.
 
 If you agree with their recommendations, make the changes and request a fresh
-review after. Continue this process until all delegates are satisfied with the
-outcome.
+review after. Stop when no delegate reports an in-scope blocker, or after three
+rounds. Then report the findings you did not fix, and why.
 
 Do not let repeated reviews result in scope creep. It is your job to fight to
 keep scope limited.
