@@ -77,7 +77,9 @@ reproduction, a screenshot. Use the most direct proof the change allows:
   PR when they help and you have a way to upload them.
 
 When you cannot find a way to prove a change, you do not have full confidence.
-Ask the user.
+Do not ask the user: try a more direct method (run it, reproduce it, add a
+test). If nothing proves it, leave that PR open and unmerged, say why in the
+report, and move on to the rest of the work.
 
 ## Merge gate
 
@@ -105,18 +107,33 @@ it is waiting: `AskUserQuestion` in Claude Code, `request_user_input` in Codex,
 or the question tool your harness has. Put all the context in the question:
 the PR link, what blocks you, and the options with your recommendation first.
 
-Ask only when you cannot continue alone:
+The user said "full send" because they do not want to be stopped. Every
+question breaks that. Ask only for these 4 cases, and nothing else:
 
-- You cannot prove the change.
-- The merge gate cannot pass, and you cannot fix that yourself.
-- The next step is outside the grant above: deleting data, touching production,
-  changing things outside the repo, closing a PR, or force-pushing any other
-  branch.
-- The goal is ambiguous in a way that changes the result.
-- Another PR makes this one obsolete.
+1. Deleting data that cannot be regenerated. (Build output, caches and
+   targets can be regenerated: delete them yourself.)
+2. Money, accounts, signing, or publishing or talking to a third party.
+3. Touching production or a host outside the repo's sanctioned path.
+4. A secret or login only the user has (use the secret tool, not a question).
 
-Decide everything else yourself with sensible defaults, and list those decisions
-in the report.
+Everything else has a default. Do it, and list it in the report:
+
+- Merge gate cannot pass and you cannot fix it: leave the PR open, say why,
+  continue with other work.
+- Review rounds run out below the bar: split the PR or shrink it to what
+  passes, and review again.
+- PR is over a size or line limit: split it.
+- Work depends on another PR: stack it and keep going.
+- Goal is ambiguous: pick the reading closest to the request and say so.
+- Another PR or thread makes this one obsolete: keep the further-along one,
+  close or cancel the other.
+- Finding outside this change: make it the next PR, not a question.
+- One path is broken and another works: use the one that works.
+
+Before you call the question tool, check: is it one of the 4 cases? If not,
+do not call it. Never send the same question twice. When one of the 4 cases
+comes up, ask early, all at once in one question, and keep working on
+everything else while you wait.
 
 If no question tool is available, or the tool returns no answer, take the safe
 path: leave the PR open and unmerged, and start your final message with the
