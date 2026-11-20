@@ -68,6 +68,8 @@ STATE_DIR = Path.home() / ".local" / "state" / "pr-wait"
 # instead of replaying hours of comments as new events.
 STALE_STATE_SECONDS = 6 * 3600
 MAX_FAILED_POLLS = 10
+# A hung gh call would block the watcher silently and keep holding the lock.
+GH_TIMEOUT_SECONDS = 120
 TRANSIENT = re.compile(
     r"HTTP (5\d\d|429)|rate limit|timed? ?out|connection (reset|refused)|EOF|"
     r"temporar|could not resolve host|TLS handshake|Something went wrong",
@@ -124,7 +126,11 @@ def gh(args: list[str], allow: tuple[int, ...] = (0,)) -> subprocess.CompletedPr
     """Run gh. Retries transient failures (HTTP 5xx or 429, network) with backoff."""
     delay = 2
     for attempt in range(5):
-        proc = subprocess.run(["gh", *args], capture_output=True, text=True)
+        try:
+            proc = subprocess.run(["gh", *args], capture_output=True, text=True, timeout=GH_TIMEOUT_SECONDS)
+        except subprocess.TimeoutExpired:
+            # Matches TRANSIENT, so it retries with backoff like a network error.
+            proc = subprocess.CompletedProcess(["gh", *args], 124, "", f"gh timed out after {GH_TIMEOUT_SECONDS}s")
         transient = proc.returncode != 0 and bool(TRANSIENT.search(proc.stderr))
         if not transient and proc.returncode in allow:
             return proc
