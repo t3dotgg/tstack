@@ -17,6 +17,7 @@ not.
 | `takeover` | "take over" | Finishes someone else's PR, branch, or agent thread, and keeps their credit. |
 | `babysit-pr` | "babysit" | Watches a PR through CI and review bots, and fixes the real findings. |
 | `modernize` | "modernize" | Rebases an old PR and decides if it should still exist. |
+| `polish-docs` | "polish docs" | Has Neon write or rewrite docs for people to read, then checks the facts with `sol-loop`. |
 | `leaving-pr-comments` | (automatic) | Formats comments that an agent posts on your behalf. |
 
 Some skills call others. Install the ones they need too:
@@ -24,6 +25,7 @@ Some skills call others. Install the ones they need too:
 - `full-send` uses `sol-loop`, `file-pr`, and `babysit-pr`.
 - `full-stop` uses `full-send`.
 - `takeover` uses `modernize`, `file-pr`, `babysit-pr`, and `leaving-pr-comments`.
+- `polish-docs` uses `sol-loop`.
 - `file-pr`, `babysit-pr`, and `modernize` use `leaving-pr-comments`.
 
 ## Install
@@ -38,7 +40,8 @@ cp -R tstack/skills/* ~/.codex/skills/    # Codex
 
 - An authenticated [GitHub CLI](https://cli.github.com) (`gh`).
 - `python3` for `babysit-pr`'s `pr-wait` script.
-- `council` and `sol-loop` need subagents on other providers' models. T3 Code
+- `council`, `sol-loop`, and `polish-docs` need subagents on other providers'
+  models. `polish-docs` needs Neon on Antigravity. T3 Code
   does this with `delegate_task`. Otherwise you need a harness that can run
   those models.
 
