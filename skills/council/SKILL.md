@@ -21,9 +21,12 @@ In T3 Code, use `orchestrator_capabilities` to resolve the models, then
 the harness's subagent tools. If you cannot reach three providers, or a named
 member is unavailable, report it instead of substituting.
 
-Give each delegate the request and relevant context. For review or feedback,
-keep their work read-only. Collect their responses and summarize the useful
-findings, disagreements, and recommended next steps.
+Give each delegate the user's request as given, including any lead the user
+offers, and the context it needs: the diff or files, the intent, the scope,
+and check results. For review or feedback, keep their work read-only. Tell
+each delegate not to start subagents or delegates of its own. Collect their
+responses and summarize the useful findings, disagreements, and recommended
+next steps.
 
 Do not wait idle. When a result arrives, check its findings against the code
 at once and decide what to fix while the other delegates run. Do not edit
@@ -33,7 +36,11 @@ late result as feedback and do not record its score.
 
 For a code review, ask each delegate for a score out of 10.
 Count each full review pass as one round.
-A fresh review after fixes starts a new round.
+A fresh review after fixes starts a new round. Start each round with a new
+delegate per member. In T3 Code that is a new `delegate_task`, and elsewhere
+a new subagent. Brief the new delegate as in round 1, with the current diff.
+Do not send earlier findings or your replies to them. Check the earlier
+findings against the code yourself.
 
 If the work ends in a pull request, put the results in the PR description.
 Put this section before the model and harness line at the end:
