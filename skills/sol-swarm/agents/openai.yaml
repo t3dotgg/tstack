@@ -1,0 +1,4 @@
+interface:
+  display_name: "Sol Swarm"
+  short_description: "Orchestrate parallel high-reasoning Codex Sol workers via delegate_task"
+  default_prompt: "Use $sol-swarm to fan out this multi-subsystem task across parallel Codex Sol workers and close with a read-only post-integration review."
