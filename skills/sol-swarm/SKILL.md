@@ -62,7 +62,10 @@ Pairs naturally with `coding-discipline`, `systemic-audit`, and `sol-loop`.
   launch a fresh read-only `delegate_task` (`role: "review"`, high-reasoning
   Sol) over the **combined** diff to audit wire/protocol edges, rescanning/auth
   seams, reconnect/stall lifecycles, cross-worker contracts, and coordinator
-  integration glue without sharing the implementers' blind spots.
+  integration glue without sharing the implementers' blind spots. When composing
+  with `sol-loop`, use `sol-swarm` for parallel implementation, integrate worker
+  outputs, and run `sol-loop` strictly as a single-reviewer closing loop over
+  the combined diff.
 - **Multi-machine work:** Pass `target.environmentId` when targeting another
   linked environment.
 
@@ -80,10 +83,17 @@ prompt must be self-contained:
   `cargo fmt` on owned files, `cargo clippy --all-targets -- -D warnings`,
   `tsc --noEmit`, etc.) alongside tests after the final edit, plus explicit
   toolchain `PATH`s on non-interactive shells when Rustup, NVM, or Homebrew are
-  not on the default `PATH`.
-- **Handoff:** ask for changed files, root causes fixed, exact verification
-  counts (including fmt/lint status), any intentional security/SDK compatibility
-  or fixture breaks, and residual risks or assumptions.
+  not on the default `PATH`. When multiple Rust workers share one checkout
+  (`isolation: "shared"`), have workers run formatter checks on owned files +
+  targeted tests (treating only touched-file diagnostics as failures if
+  pre-existing warnings exist elsewhere) and run full-crate
+  `cargo clippy --all-targets -- -D warnings` once after integration so workers
+  do not contend on Cargo's build lock.
+- **Handoff:** ask for changed files, root causes fixed, exact inline
+  verification counts and concise excerpts (including fmt/lint status; never
+  cite provider-private or local artifact handles that the coordinator cannot
+  dereference), any intentional security/SDK compatibility or fixture breaks,
+  and residual risks or assumptions.
 
 ## Coordination Discipline
 

@@ -55,7 +55,7 @@ When fixing performance, I/O storms, or quadratic work:
 
 ## 6. Verify after the final edit
 
-- Run the repo's formatter check, strict lint/typecheck gate, and relevant tests on every touched file/crate **after your very last file edit** (e.g., `cargo fmt --check` or `cargo fmt` on owned files + `cargo clippy --all-targets -- -D warnings`, `tsc --noEmit`, or the project's lint suite)—not just `cargo check` or focused unit tests. Any subsequent edit—even a one-line tweak—invalidates prior results and requires a fresh run.
+- Run the repo's formatter check, strict lint/typecheck gate, and relevant tests on every touched file/crate **after your very last file edit** (e.g., `cargo fmt --check` or `cargo fmt` on owned files + `cargo clippy --all-targets -- -D warnings`, `tsc --noEmit`, or the project's lint suite)—not just `cargo check` or focused unit tests. In parallel shared-checkout Rust runs (or crates with pre-existing unrelated warnings), run formatter checks and targeted tests on owned files, fix all warnings in touched files, and leave full-crate `clippy` to the post-integration pass to avoid Cargo build-lock contention. Any subsequent edit—even a one-line tweak—invalidates prior results and requires a fresh run.
 - Confirm the intended tests actually executed and would fail without your fix; verify downstream consumer contracts first so tests never codify a flawed local assumption about sentinels or guards. For resource/size/rate budgets, test near the real cap (e.g., 60–90% allowed plus >100% rejected) so a silently halved budget cannot hide behind tiny fixtures. Never weaken existing tests or assertions to make a suite pass.
 - Leave the working directory and temp dirs clean of stray temporary files or logs.
 
@@ -65,5 +65,5 @@ Lead with the outcome and exact evidence:
 
 - **Changed files** and the root cause fixed in each.
 - **Sibling sites checked** (which were updated and which were verified already safe).
-- **Post-final-edit verification:** exact command(s), test/check counts, and observed result.
+- **Post-final-edit verification:** exact command(s), inline test/check counts, and observed result (inline concise failure/log excerpts directly—never rely on provider-private or local artifact handles that another agent, worktree, or machine cannot dereference).
 - **Trade-offs & limits:** call out any intentional security/behavior tightening that breaks existing SDK callers, tests, or fixtures (and what follow-up allowlist/migration is needed), plus any subtle edge-case assumption or unverified runtime/hardware boundary.
