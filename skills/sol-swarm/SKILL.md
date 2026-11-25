@@ -53,7 +53,10 @@ Pairs naturally with `coding-discipline`, `systemic-audit`, and `sol-loop`.
   into disjoint subsystems (e.g., storage, async pipeline, UI/canvas, test
   harness) and dispatch one Sol worker per slice. Freeze shared contracts/types
   before fan-out and decouple parallel UI slices via render props/slots so every
-  worker can typecheck and test independently with zero file collisions.
+  worker can typecheck and test independently with zero file collisions. When
+  the repo has strict mock/dependency test loaders, grep `tests/` for owned
+  component basenames before fan-out (or budget a quick coordinator test-harness
+  sync right after integration).
 - **Wide systemic audits:** Fan out read-only workers across different risk
   lenses (concurrency/locking, disk/fsync/I/O storms, UI scaling/rendering,
   lifecycle/state leaks) and synthesize their findings.
@@ -78,17 +81,17 @@ prompt must be self-contained:
   "do not modify" boundaries when sharing a checkout).
 - **Goal and invariants:** user symptoms, acceptance criteria, API/on-disk
   compatibility requirements, and non-goals.
-- **Verification & toolchain:** require the repo's formatter + strict
-  warning-free lint gate on touched files/crates (`cargo fmt --check` or
-  `cargo fmt` on owned files, `cargo clippy --all-targets -- -D warnings`,
-  `tsc --noEmit`, etc.) alongside tests after the final edit, plus explicit
-  toolchain `PATH`s on non-interactive shells when Rustup, NVM, or Homebrew are
-  not on the default `PATH`. When multiple Rust workers share one checkout
-  (`isolation: "shared"`), have workers run formatter checks on owned files +
-  targeted tests (treating only touched-file diagnostics as failures if
-  pre-existing warnings exist elsewhere) and run full-crate
-  `cargo clippy --all-targets -- -D warnings` once after integration so workers
-  do not contend on Cargo's build lock.
+- **Verification & toolchain:** pass the repo's exact package/workspace scripts
+  (`npm run type-check`, `bun run lint`, `cargo fmt --check` or `cargo fmt` on
+  owned files, `cargo clippy --all-targets -- -D warnings`, etc.) alongside
+  tests after the final edit so workers do not invoke raw tools (`vue-tsc`,
+  `tsc`) with inconsistent flags, plus explicit toolchain `PATH`s on
+  non-interactive shells when Rustup, NVM, or Homebrew are not on the default
+  `PATH`. When multiple Rust workers share one checkout (`isolation: "shared"`),
+  have workers run formatter checks on owned files + targeted tests (treating
+  only touched-file diagnostics as failures if pre-existing warnings exist
+  elsewhere) and run full-crate `cargo clippy --all-targets -- -D warnings` once
+  after integration so workers do not contend on Cargo's build lock.
 - **Handoff:** ask for changed files, root causes fixed, exact inline
   verification counts and concise excerpts (including fmt/lint status; never
   cite provider-private or local artifact handles that the coordinator cannot
@@ -100,7 +103,8 @@ prompt must be self-contained:
 - Skip the swarm for trivial 1-2 file edits that you can finish directly in one
   turn; use it freely for anything multi-file, subtle, vague, or parallelizable.
 - When integrating worker outputs, skim each diff for cross-module contract
-  drift, sibling-endpoint guard parity, global `z-index`/fixed-dock occlusion,
+  drift, sibling-endpoint guard parity, bypassed safety interlocks, backend
+  wire-unit/side-effect mismatches, global `z-index`/fixed-dock occlusion,
   decoupled auth-vs-decode parsers, `Option::None` fail-open paths, droppable-vs-
   control channel backpressure, unbounded fallback queues / closed-channel
   handling, double-charged library budgets, domain-specific assumptions (e.g.,
