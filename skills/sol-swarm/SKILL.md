@@ -65,13 +65,20 @@ Pairs naturally with `coding-discipline`, `systemic-audit`, and `sol-loop`.
   launch a fresh read-only `delegate_task` (`role: "review"`, high-reasoning
   Sol) over the **combined** diff to audit wire/protocol edges, rescanning/auth
   seams, reconnect/stall lifecycles, cross-worker contracts, and coordinator
-  integration glue without sharing the implementers' blind spots. When composing
-  with `sol-loop`, use `sol-swarm` for parallel implementation, integrate worker
-  outputs, and run `sol-loop` strictly as a single-reviewer closing loop over
-  the combined diff. For UI or mockup-driven swarms, pair the code review with
-  a rendered visual check at both standard (`1440-1920px`) and wide (`2560px`)
-  viewports (or explicitly report that rendered visual parity was not verified
-  yet).
+  integration glue without sharing the implementers' blind spots. On
+  safety-critical state machines, control/EKF math, hardware/wire protocols, or
+  async concurrency, do **not** treat one green test suite or a single review
+  pass as final—run iterative fresh-context read-only review passes (typically
+  2–3 rounds until a pass returns clean) paired with real simulation or wire
+  binaries where available rather than mocks alone, and explicitly instruct
+  reviewers to audit test diffs as strictly as production code (flagging
+  weakened tolerances/settle windows, reset baselines, and non-discriminating
+  assertions). When composing with `sol-loop`, use `sol-swarm` for parallel
+  implementation, integrate worker outputs, and run `sol-loop` strictly as a
+  single-reviewer closing loop over the combined diff. For UI or mockup-driven
+  swarms, pair the code review with a rendered visual check at both standard
+  (`1440-1920px`) and wide (`2560px`) viewports (or explicitly report that
+  rendered visual parity was not verified yet).
 - **Multi-machine work:** Pass `target.environmentId` when targeting another
   linked environment.
 
@@ -109,7 +116,10 @@ prompt must be self-contained:
 - Skip the swarm for trivial 1-2 file edits that you can finish directly in one
   turn; use it freely for anything multi-file, subtle, vague, or parallelizable.
 - When integrating worker outputs, skim each diff for cross-module contract
-  drift, sibling-endpoint guard parity, bypassed safety interlocks, backend
+  drift, sibling-endpoint guard parity, bypassed safety interlocks,
+  cached-status safety authorization or lock-drop-before-effect TOCTOU,
+  partial-packet leakage after rejection, out-of-order counter rollbacks,
+  stalled error-body reads, weakened or non-discriminating test diffs, backend
   wire-unit/side-effect mismatches, global `z-index`/fixed-dock occlusion,
   host-framework CSS specificity leaks, ultrawide/SVG scaling and composed-view
   duplicate headers or toolbars, decoupled auth-vs-decode parsers,
