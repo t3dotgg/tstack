@@ -68,7 +68,10 @@ Pairs naturally with `coding-discipline`, `systemic-audit`, and `sol-loop`.
   integration glue without sharing the implementers' blind spots. When composing
   with `sol-loop`, use `sol-swarm` for parallel implementation, integrate worker
   outputs, and run `sol-loop` strictly as a single-reviewer closing loop over
-  the combined diff.
+  the combined diff. For UI or mockup-driven swarms, pair the code review with
+  a rendered visual check at both standard (`1440-1920px`) and wide (`2560px`)
+  viewports (or explicitly report that rendered visual parity was not verified
+  yet).
 - **Multi-machine work:** Pass `target.environmentId` when targeting another
   linked environment.
 
@@ -80,7 +83,10 @@ prompt must be self-contained:
 - **Exact scope:** repository path and owned files/modules (plus explicit
   "do not modify" boundaries when sharing a checkout).
 - **Goal and invariants:** user symptoms, acceptance criteria, API/on-disk
-  compatibility requirements, and non-goals.
+  compatibility requirements, and non-goals. For UI slices backed by approved
+  mockups, include the actual mockup file paths so workers inspect them directly
+  (never rely on prose-only summaries) and state key layout geometry/chrome
+  invariants (grids vs flat rows, badges, CTAs, max-width caps).
 - **Verification & toolchain:** pass the repo's exact package/workspace scripts
   (`npm run type-check`, `bun run lint`, `cargo fmt --check` or `cargo fmt` on
   owned files, `cargo clippy --all-targets -- -D warnings`, etc.) alongside
@@ -105,9 +111,11 @@ prompt must be self-contained:
 - When integrating worker outputs, skim each diff for cross-module contract
   drift, sibling-endpoint guard parity, bypassed safety interlocks, backend
   wire-unit/side-effect mismatches, global `z-index`/fixed-dock occlusion,
-  decoupled auth-vs-decode parsers, `Option::None` fail-open paths, droppable-vs-
-  control channel backpressure, unbounded fallback queues / closed-channel
-  handling, double-charged library budgets, domain-specific assumptions (e.g.,
-  sequence monotonicity across reconnects, hardcoded single-hardware thresholds),
-  or newly added private fields on public structs, then run final integrated
-  verification on the combined tree before reporting to the user.
+  host-framework CSS specificity leaks, ultrawide/SVG scaling and composed-view
+  duplicate headers or toolbars, decoupled auth-vs-decode parsers,
+  `Option::None` fail-open paths, droppable-vs-control channel backpressure,
+  unbounded fallback queues / closed-channel handling, double-charged library
+  budgets, domain-specific assumptions (e.g., sequence monotonicity across
+  reconnects, hardcoded single-hardware thresholds), or newly added private
+  fields on public structs, then run final integrated verification on the
+  combined tree before reporting to the user.
