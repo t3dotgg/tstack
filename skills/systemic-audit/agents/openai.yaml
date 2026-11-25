@@ -1,0 +1,4 @@
+interface:
+  display_name: "Systemic Audit"
+  short_description: "Cross-cutting P0/P1 bug, I/O, scale, and lifecycle repo audits"
+  default_prompt: "Use $systemic-audit to run a bounded, repo-wide audit for P0/P1 disk storms, rendering bottlenecks, UI scale drift, concurrency races, and data-loss bugs."

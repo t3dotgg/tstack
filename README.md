@@ -13,6 +13,9 @@ not.
 | `full-stop` | "full stop" | Same as `full-send`, but stops when the PR is ready for you to merge. |
 | `council` | "council" | Gets review from three models from different providers, and loops until they agree. |
 | `sol-loop` | "sol loop" | Reviews a change with GPT Sol in a loop until both agents agree. |
+| `sol-swarm` | "sol swarm" | Fans out multi-subsystem work across parallel high-reasoning Sol workers and closes with a read-only post-integration review. |
+| `coding-discipline` | (automatic) | Enforces sibling sweeps, root-cause fixes, lifecycle safety, strict post-edit verification, and evidence-backed handoffs. |
+| `systemic-audit` | "systemic audit" | Runs a bounded, read-only 4-pass repo audit for P0/P1 I/O storms, concurrency stalls, UI bugs, and data-loss defects. |
 | `file-pr` | "file a PR" | Files a short PR that leads with the problem, not an inventory of changes. |
 | `takeover` | "take over" | Finishes someone else's PR, branch, or agent thread, and keeps their credit. |
 | `babysit-pr` | "babysit" | Watches a PR through CI and review bots, and fixes the real findings. |
@@ -25,6 +28,7 @@ Some skills call others. Install the ones they need too:
 - `full-stop` uses `full-send`.
 - `takeover` uses `modernize`, `file-pr`, `babysit-pr`, and `leaving-pr-comments`.
 - `file-pr`, `babysit-pr`, and `modernize` use `leaving-pr-comments`.
+- `sol-swarm` pairs well with `coding-discipline`, `systemic-audit`, and `sol-loop`.
 
 ## Install
 
@@ -38,9 +42,9 @@ cp -R tstack/skills/* ~/.codex/skills/    # Codex
 
 - An authenticated [GitHub CLI](https://cli.github.com) (`gh`).
 - `python3` for `babysit-pr`'s `pr-wait` script.
-- `council` and `sol-loop` need subagents on other providers' models. T3 Code
-  does this with `delegate_task`. Otherwise you need a harness that can run
-  those models.
+- `council`, `sol-loop`, and `sol-swarm` need subagents on other providers'
+  models. T3 Code does this with `delegate_task`. Otherwise you need a harness
+  that can run those models.
 
 ## Make them yours
 

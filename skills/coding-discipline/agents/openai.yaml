@@ -1,0 +1,4 @@
+interface:
+  display_name: "Coding Discipline"
+  short_description: "Cross-cutting sweeps, lifecycle safety, and verified handoffs"
+  default_prompt: "Use $coding-discipline to audit sibling sites, fix root causes cleanly, verify after the final edit, and return an evidence-backed handoff."
